@@ -7,15 +7,15 @@ WIN_RIGHT_UP DB 1,3,43,4,73
 BUTTON DB 1,19,5,19,10
 FILE_TEXT DB 1,19,12,19,35
 winnum DB 1
-OLD0B DD ?    ;´æ´¢ÏµÍ³0BHÖÐ¶ÏÏòÁ¿
-FLAG DB 0      ;±êÖ¾Î»
+OLD0B DD ?    ;å­˜å‚¨ç³»ç»Ÿ0BHä¸­æ–­å‘é‡
+FLAG DB 0      ;æ ‡å¿—ä½
 CONT DB 0
 CURSE_LEFT DB 3,5
 CURSE_RIGHT DB 3,43
 CURSE_BUTTON DB 19,6
-lx	db 3    ;win1µ±Ç°¹â±êÎ»ÖÃ
+lx	db 3    ;win1å½“å‰å…‰æ ‡ä½ç½®
 ly	db 5
-rx	db 3    ;win2µ±Ç°¹â±êÎ»ÖÃ
+rx	db 3    ;win2å½“å‰å…‰æ ‡ä½ç½®
 ry	db 43
 FILE DB 'file$'
 COLOR DB 0
@@ -29,23 +29,23 @@ CODE SEGMENT USE16
 BEG: MOV AX,DATA
 	 MOV DS,AX
 	 CALL UI_DESIGN
-	 CLI			;¹ØÖÐ¶Ï
-	 CALL I8250		;¸¨´®¿Ú³õÊ¼»¯
-	 CALL I8259		;¿ª·Å8259A¸¨´®¿ÚÖÐ¶Ï
-	 CALL RD0B		;±£´æ0BHÖÐ¶ÏÏòÁ¿
-	 CALL WR0B	    ;ÖÃ»»0BHÖÐ¶ÏÏòÁ¿
-	 STI			;¿ªÖÐ¶Ï
+	 CLI			;å…³ä¸­æ–­
+	 CALL I8250		;è¾…ä¸²å£åˆå§‹åŒ–
+	 CALL I8259		;å¼€æ”¾8259Aè¾…ä¸²å£ä¸­æ–­
+	 CALL RD0B		;ä¿å­˜0BHä¸­æ–­å‘é‡
+	 CALL WR0B	    ;ç½®æ¢0BHä¸­æ–­å‘é‡
+	 STI			;å¼€ä¸­æ–­
 SCANT:
 	 CMP FLAG,-1    
 	 JE RETURN
-	 MOV DX,2FDH	;²éÑ¯·¢ËÍ±£³Ö¼Ä´æÆ÷
+	 MOV DX,2FDH	;æŸ¥è¯¢å‘é€ä¿æŒå¯„å­˜å™¨
 	 IN AL,DX
 	 TEST AL,20H
 	 JZ SCANT
-	 MOV AH,1	;²éÑ¯¼üÅÌ»º³åÇø
+	 MOV AH,1	;æŸ¥è¯¢é”®ç›˜ç¼“å†²åŒº
 	 INT 16H
 	 JZ SCANT
-	 MOV AH,0	;¶ÁÈ¡¼üÅÌ»º³åÇøµÄÄÚÈÝ ASCII->AL
+	 MOV AH,0	;è¯»å–é”®ç›˜ç¼“å†²åŒºçš„å†…å®¹ ASCII->AL
 	 INT 16H
 	 AND AL,7FH
 	 MOV DX,2F8H 
@@ -55,24 +55,24 @@ SCANT:
 TWAIT:
 	 MOV DX,2FDH
 	 IN AL,DX
-	 TEST AL,40H   ;²âÊÔÒ»Ö¡ÊÇ·ñ·¢ËÍÍê
+	 TEST AL,40H   ;æµ‹è¯•ä¸€å¸§æ˜¯å¦å‘é€å®Œ
 	 JZ TWAIT
-RETURN:            ;µ±Ò»Ö¡·¢ËÍÍêÔòÖ´ÐÐ½áÊø³ÌÐò
-	 CALL RESET    ;»Ö¸´ÏµÍ³0BHÖÐ¶ÏÏòÁ¿
+RETURN:            ;å½“ä¸€å¸§å‘é€å®Œåˆ™æ‰§è¡Œç»“æŸç¨‹åº
+	 CALL RESET    ;æ¢å¤ç³»ç»Ÿ0BHä¸­æ–­å‘é‡
 	 MOV AH,4CH
 	 INT 21H
 
-;½ÓÊÕÖÐ¶Ï·þÎñ×Ó³ÌÐò
+;æŽ¥æ”¶ä¸­æ–­æœåŠ¡å­ç¨‹åº
 RECEIVE PROC
 	  PUSH AX
 	  PUSH DX
 	  PUSH DS
 	  MOV AX,DATA
 	  MOV DS,AX
-	  MOV DX,2F8H  ;¶ÁÈ¡½ÓÊÕ»º³åÇøµÄÄÚÈÝ
+	  MOV DX,2F8H  ;è¯»å–æŽ¥æ”¶ç¼“å†²åŒºçš„å†…å®¹
 	  IN  AL,DX
 	  AND AL,7FH
-	  ;¼ì²éÊÇ·ñÎª×ó¼ü
+	  ;æ£€æŸ¥æ˜¯å¦ä¸ºå·¦é”®
 	  CMP AL,4BH
 	  JNE is_win_right
 	  MOV BL,lx
@@ -84,7 +84,7 @@ RECEIVE PROC
 	  MOV winnum,1
 	  JMP EXIT
 is_win_right:
-      ;¼ì²éÊÇ·ñÎªÓÒ¼ü
+      ;æ£€æŸ¥æ˜¯å¦ä¸ºå³é”®
       CMP AL,4DH
       JNE is_ESC
       MOV BL,rx
@@ -96,12 +96,12 @@ is_win_right:
       MOV winnum,2
       JMP EXIT
 is_ESC:
-    ;ÅÐ¶ÏÊÇ·ñÊÇ'esc'
+    ;åˆ¤æ–­æ˜¯å¦æ˜¯'esc'
 	CMP AL,01  
 	JE NEXT
-	;²»ÊÇÔòµ÷ÓÃdisplay,½«¼üÅÌÊäÈëÏÔÊ¾ÔÚ×óÓÒ´°¿Ú
+	;ä¸æ˜¯åˆ™è°ƒç”¨display,å°†é”®ç›˜è¾“å…¥æ˜¾ç¤ºåœ¨å·¦å³çª—å£
 	CALL DISPLAY 
-	CALL Beep ;½ÓÊÕÐÅÏ¢ÌáÊ¾Òô
+	CALL Beep ;æŽ¥æ”¶ä¿¡æ¯æç¤ºéŸ³
 	JMP EXIT
 NEXT: MOV FLAG,-1
 EXIT: 
@@ -110,23 +110,23 @@ EXIT:
  	POP DS
 	POP DX
 	POP AX
-	IRET    ;ÖÐ¶Ï·µ»Ø
+	IRET    ;ä¸­æ–­è¿”å›ž
 RECEIVE ENDP
 
 DISPLAY PROC
     CMP winnum,1
-    ;ÏÔÊ¾ÔÚ×óÆÁÄ»
-	MOV AH,2	   ;²»ÊÇ"esc",ÏÔÊ¾×Ö·ûÔÚÆÁÄ»ÉÏ
+    ;æ˜¾ç¤ºåœ¨å·¦å±å¹•
+	MOV AH,2	   ;ä¸æ˜¯"esc",æ˜¾ç¤ºå­—ç¬¦åœ¨å±å¹•ä¸Š
 	MOV DL,AL
 	INT 21H
-	;ÏÔÊ¾ÔÚÓÒÆÁÄ»
+	;æ˜¾ç¤ºåœ¨å³å±å¹•
 	MOV BL,ry
 	MOV CURSE_RIGHT[1],BL
 	MOV BL,rx
 	MOV CURSE_RIGHT[0],BL
 	MOV BX,OFFSET CURSE_RIGHT
 	CALL POS_CURSE
-	MOV AH,2	   ;²»ÊÇ"esc",ÏÔÊ¾×Ö·ûÔÚÆÁÄ»ÉÏ
+	MOV AH,2	   ;ä¸æ˜¯"esc",æ˜¾ç¤ºå­—ç¬¦åœ¨å±å¹•ä¸Š
 	MOV DL,AL
 	INT 21H
 	INC ry 
@@ -182,25 +182,25 @@ Beep PROC
 	PUSH BX
 	PUSH AX
 	PUSH DX
-	MOV AX,0  ;120000H±»³ýÊý
+	MOV AX,0  ;120000Hè¢«é™¤æ•°
 	MOV DX,12H
 	MOV BX,1048  
-	DIV BX       ;¼ÆËãÆµÂÊÖµ
+	DIV BX       ;è®¡ç®—é¢‘çŽ‡å€¼
 	MOV BX,AX
-	MOV AL,10110110B ;ÉèÖÃ¶¨Ê±Æ÷¹¤×÷·½Ê½
+	MOV AL,10110110B ;è®¾ç½®å®šæ—¶å™¨å·¥ä½œæ–¹å¼
     OUT 43H,AL
   
     MOV AX,BX            
-    OUT 42H,AL   ;ÉèÖÃ¼ÆÊýÆ÷µÍ8Î»
+    OUT 42H,AL   ;è®¾ç½®è®¡æ•°å™¨ä½Ž8ä½
   
-    MOV AL,AH    ;ÉèÖÃ¼ÆÊýÆ÷¸ß8Î»
+    MOV AL,AH    ;è®¾ç½®è®¡æ•°å™¨é«˜8ä½
     OUT 42H,AL
   
-    IN AL,61H     ;´ò¿ªÓëÃÅ
+    IN AL,61H     ;æ‰“å¼€ä¸Žé—¨
     OR AL,03H
     OUT 61H,AL
     CALL DELAY
-    IN AL,61H     ;¹Ø±ÕÓëÃÅ
+    IN AL,61H     ;å…³é—­ä¸Žé—¨
     AND AL,0FCH
     OUT 61H,AL
     POP DX
@@ -223,30 +223,30 @@ DELAY  PROC
   	RET
 DELAY ENDP
 
-;³õÊ¼»¯8250
+;åˆå§‹åŒ–8250
 I8250 PROC
-	  MOV DX,2FBH    ;Ñ°Ö·ÎªÖÃ1
+	  MOV DX,2FBH    ;å¯»å€ä¸ºç½®1
 	  MOV AL,80H
 	  OUT DX,AL
-	  MOV DX,2F9H	 ;Ð´³ýÊý¼Ä´æÆ÷¸ß8Î»
+	  MOV DX,2F9H	 ;å†™é™¤æ•°å¯„å­˜å™¨é«˜8ä½
 	  MOV AL,0
 	  OUT DX,AL
-	  MOV DX,2F8H	 ;Ð´³ýÊý¼Ä´æÆ÷µÍ8Î»,²¨ÌØÂÊÎª1200
+	  MOV DX,2F8H	 ;å†™é™¤æ•°å¯„å­˜å™¨ä½Ž8ä½,æ³¢ç‰¹çŽ‡ä¸º1200
 	  MOV AL,60H
 	  OUT DX,AL
-	  MOV DX,2FBH  	 ;Ð´Ö¡Êý¾Ý¸ñÊ½:8Êý¾ÝÎª,1Í£Ö¹Î»,ÎÞÐ£ÑéÎ»	 
+	  MOV DX,2FBH  	 ;å†™å¸§æ•°æ®æ ¼å¼:8æ•°æ®ä¸º,1åœæ­¢ä½,æ— æ ¡éªŒä½	 
 	  MOV AL,03H
 	  OUT DX,AL
-	  MOV DX,2F9H 	 ;ÔÊÐí8250ÄÚ²¿Ìá³öÖÐ¶Ï	
+	  MOV DX,2F9H 	 ;å…è®¸8250å†…éƒ¨æå‡ºä¸­æ–­	
 	  MOV AL,01H
 	  OUT DX,AL
 	  MOV DX,2FCH
-	  MOV AL,00011000B  ;D4=1ÄÚ»·×Ô¼ì,   D3=1¿ª·ÅÖÐ¶Ï, D4=0Õý³£Í¨ÐÅ
+	  MOV AL,00011000B  ;D4=1å†…çŽ¯è‡ªæ£€,   D3=1å¼€æ”¾ä¸­æ–­, D4=0æ­£å¸¸é€šä¿¡
 	  OUT DX,AL
-	  RET     ;¶ÎÄÚ·µ»Ø
+	  RET     ;æ®µå†…è¿”å›ž
 I8250 ENDP
 
-;¿ª·ÅÖ÷8259¸¨´®¿ÚÖÐ¶Ï  D3Î»
+;å¼€æ”¾ä¸»8259è¾…ä¸²å£ä¸­æ–­  D3ä½
 I8259 PROC
       IN AL,0A1H
       AND AL,11101111B
@@ -254,7 +254,7 @@ I8259 PROC
 	  IN AL,21H
 	  AND AL,11110011B
 	  OUT 21H,AL
-	  RET     ;¶ÎÄÚ·µ»Ø
+	  RET     ;æ®µå†…è¿”å›ž
 I8259 ENDP
 
 RD0B PROC
@@ -262,7 +262,7 @@ RD0B PROC
 	  INT 21H
 	  MOV WORD PTR OLD0B,BX
 	  MOV WORD PTR OLD0B+2,ES
-	  RET   ;¶ÎÄÚ·µ»Ø
+	  RET   ;æ®µå†…è¿”å›ž
 RD0B ENDP
 
 WR0B PROC
@@ -273,78 +273,78 @@ WR0B PROC
 	  MOV AX,250BH
 	  INT 21H
 	  POP DS
-	  RET	;¶ÎÄÚ·µ»Ø
+	  RET	;æ®µå†…è¿”å›ž
 WR0B ENDP
 	 
 	 
 RESET PROC
 	  IN AL,21H
-	  OR AL,00001000B    ;½«ÖÐ¶ÏÆÁ±Î¼Ä´æÆ÷µÄ¸¨´®¿ÚÖÐ¶ÏÆÁ±Î×ÖÖÃ1£¬¹Ø±Õ8259¸¨´®¿ÚÖÐ¶Ï
+	  OR AL,00001000B    ;å°†ä¸­æ–­å±è”½å¯„å­˜å™¨çš„è¾…ä¸²å£ä¸­æ–­å±è”½å­—ç½®1ï¼Œå…³é—­8259è¾…ä¸²å£ä¸­æ–­
 	  OUT 21H,AL
 	  MOV AX,250BH
 	  MOV DX,WORD PTR OLD0B
 	  MOV DS,WORD PTR OLD0B+2
 	  INT 21H
-	  RET	;¶ÎÄÚ·µ»Ø
+	  RET	;æ®µå†…è¿”å›ž
 RESET ENDP
 
-CLEAR PROC ;ÇåÆÁ
-	MOV AH,6 ;ÏòÉÏ¹ö¶¯´°¿Ú
+CLEAR PROC ;æ¸…å±
+	MOV AH,6 ;å‘ä¸Šæ»šåŠ¨çª—å£
 	MOV AL,0 ;
-	MOV BH,7 ;±³¾°ÑÕÉ«ºÍÎÄ×ÖÑÕÉ«
-	MOV CH,0 ;¸ßÐÐÊý
-	MOV CL,0 ;×óÁÐÊý
-    MOV DH,24 ;µÍÐÐÊý
-	MOV DL,79 ;ÓÒÁÐÊý
+	MOV BH,7 ;èƒŒæ™¯é¢œè‰²å’Œæ–‡å­—é¢œè‰²
+	MOV CH,0 ;é«˜è¡Œæ•°
+	MOV CL,0 ;å·¦åˆ—æ•°
+    MOV DH,24 ;ä½Žè¡Œæ•°
+	MOV DL,79 ;å³åˆ—æ•°
 	INT 10H 
-	RET	;¶ÎÄÚ·µ»Ø
+	RET	;æ®µå†…è¿”å›ž
 CLEAR ENDP
 
 UI_DESIGN PROC
-	;ÇåÆÁ
+	;æ¸…å±
 	 CALL CLEAR
 	 LEA SI,SHOW
 	 MOV DX,SI
 	 MOV AH,09H
 	 INT 21H
-	 ;ÉèÖÃ×ó´°¿Ú²ÎÊý
+	 ;è®¾ç½®å·¦çª—å£å‚æ•°
 	 MOV BX,OFFSET WIN_LEFT
 	 MOV CL,WIN_COLOR
 	 MOV COLOR,CL
 	 CALL SCROLL
-	 ;ÉèÖÃÓÒ´°¿Ú²ÎÊý
+	 ;è®¾ç½®å³çª—å£å‚æ•°
 	 MOV BX,OFFSET WIN_RIGHT
 	 CALL SCROLL
-	 ;ÉèÖÃ°´Å¥²ÎÊý
+	 ;è®¾ç½®æŒ‰é’®å‚æ•°
 	 MOV BX,OFFSET BUTTON
 	 MOV CL,FILE_COLOR
 	 MOV COLOR,CL
 	 CALL SCROLL
-	 ;ÉèÖÃfileBUTTONs
+	 ;è®¾ç½®fileBUTTONs
 	 MOV BX,OFFSET CURSE_BUTTON
 	 CALL POS_CURSE
 	 MOV DX,OFFSET FILE
 	 MOV AH,9
 	 INT 21H
-	 ;ÉèÖÃfile_text
+	 ;è®¾ç½®file_text
 	 MOV BX,OFFSET FILE_TEXT
 	 CALL SCROLL
-	 ;ÉèÖÃ³õÊ¼¹â±êÎ»ÖÃ
+	 ;è®¾ç½®åˆå§‹å…‰æ ‡ä½ç½®
 	 MOV BX,OFFSET CURSE_LEFT
 	 CALL POS_CURSE
 	 RET
 UI_DESIGN ENDP
 
-SCROLL PROC ;ÏÔÊ¾´°¿Ú
-	  MOV AH,6 ;ÏòÉÏ¹ö¶¯´°¿Ú
-	  MOV AL,[BX]  ;ÉÏ¾íÐÐÊý
-	  MOV CH,[BX + 1] ;×óÉÏ½ÇÐÐºÅ
-	  MOV CL,[BX + 2] ;×óÉÏ½ÇÁÐºÅ
-	  MOV DH,[BX + 3] ;ÓÒÉÏ½ÇÐÐºÅ
-	  MOV DL,[BX + 4] ;ÓÒÉÏ½ÇÁÐºÅ
-	  MOV BH,COLOR;±³¾°ÑÕÉ«ºÍ×Ö·ûÑÕÉ« ÇàÉ«±³¾°ºÍ»ÆÉ«ÎÄ×Ö
+SCROLL PROC ;æ˜¾ç¤ºçª—å£
+	  MOV AH,6 ;å‘ä¸Šæ»šåŠ¨çª—å£
+	  MOV AL,[BX]  ;ä¸Šå·è¡Œæ•°
+	  MOV CH,[BX + 1] ;å·¦ä¸Šè§’è¡Œå·
+	  MOV CL,[BX + 2] ;å·¦ä¸Šè§’åˆ—å·
+	  MOV DH,[BX + 3] ;å³ä¸Šè§’è¡Œå·
+	  MOV DL,[BX + 4] ;å³ä¸Šè§’åˆ—å·
+	  MOV BH,COLOR;èƒŒæ™¯é¢œè‰²å’Œå­—ç¬¦é¢œè‰² é’è‰²èƒŒæ™¯å’Œé»„è‰²æ–‡å­—
 	  INT 10H
-	  RET	;¶ÎÄÚ·µ»Ø
+	  RET	;æ®µå†…è¿”å›ž
 SCROLL ENDP
 
 POS_CURSE PROC
@@ -353,7 +353,7 @@ POS_CURSE PROC
 	MOV BH,0
 	MOV AH,2
 	INT 10H
-	RET  ;¶ÎÄÚ·µ»Ø
+	RET  ;æ®µå†…è¿”å›ž
 POS_CURSE ENDP
 
 MOUSE PROC
@@ -362,30 +362,22 @@ MOUSE PROC
 	PUSH DS
 	MOV AX,DATA
 	MOV DS,AX
-	MOV AX,0  ;³õÊ¼»¯Êó±ê
+	MOV AX,0  ;åˆå§‹åŒ–é¼ æ ‡
     INT 33H
-    MOV AX,1  ;ÏÔÊ¾Êó±ê
+    MOV AX,1  ;æ˜¾ç¤ºé¼ æ ‡
     INT 33H
-    MOV AX,0AH  ;ÉèÖÃÎÄ±¾Êó±êµÄÐÎ×´
-    MOV CX,6E41H ;15ÎªÉÁË¸£¬14-12×Ö·û±³¾°É«£¬11ÁÁ¶È£¬10-8×Ö·ûÑÕÉ«£¬7-0Êó±êÖ¸Õë·ûºÅ
+    MOV AX,0AH  ;è®¾ç½®æ–‡æœ¬é¼ æ ‡çš„å½¢çŠ¶
+    MOV CX,6E41H ;15ä¸ºé—ªçƒï¼Œ14-12å­—ç¬¦èƒŒæ™¯è‰²ï¼Œ11äº®åº¦ï¼Œ10-8å­—ç¬¦é¢œè‰²ï¼Œ7-0é¼ æ ‡æŒ‡é’ˆç¬¦å·
     INT 33H
   	MOV AX,05
   	MOV BX,0
   	MOV AL,20H 
-	OUT 20H,AL  ;¸ø8259AÐ´½áÊø×Ö
+	OUT 20H,AL  ;ç»™8259Aå†™ç»“æŸå­—
  	POP DS
 	POP DX
 	POP AX
-	IRET    ;ÖÐ¶Ï·µ»Ø
+	IRET    ;ä¸­æ–­è¿”å›ž
 MOUSE ENDP
 
 CODE ENDS
 	 END BEG
-
-
-
-
-
-
-
-
